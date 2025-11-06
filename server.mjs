@@ -15,6 +15,7 @@ const __dirname = path.dirname(__filename);
 const config = {
   port: process.env.PORT || 8080,
   password: process.env.PASSWORD || '',
+  nsfwPassword: process.env.NSFWPASSWORD || '',
   corsOrigin: process.env.CORS_ORIGIN || '*',
   timeout: parseInt(process.env.REQUEST_TIMEOUT || '5000'),
   maxRetries: parseInt(process.env.MAX_RETRIES || '2'),
@@ -52,14 +53,13 @@ function sha256Hash(input) {
   });
 }
 
-async function renderPage(filePath, password) {
+async function renderPage(filePath, { password, nsfwPassword }) {
   let content = fs.readFileSync(filePath, 'utf8');
-  if (password !== '') {
-    const sha256 = await sha256Hash(password);
-    content = content.replace('{{PASSWORD}}', sha256);
-  } else {
-    content = content.replace('{{PASSWORD}}', '');
-  }
+
+  const passwordHash = password ? await sha256Hash(password) : '';
+  content = content.replace('{{PASSWORD}}', passwordHash);
+  content = content.replace('{{NSFWPASSWORD}}', nsfwPassword || '');
+
   return content;
 }
 
@@ -75,7 +75,7 @@ app.get(['/', '/index.html', '/player.html'], async (req, res) => {
         break;
     }
     
-    const content = await renderPage(filePath, config.password);
+    const content = await renderPage(filePath, { password: config.password, nsfwPassword: config.nsfwPassword });
     res.send(content);
   } catch (error) {
     console.error('页面渲染错误:', error);
@@ -86,7 +86,7 @@ app.get(['/', '/index.html', '/player.html'], async (req, res) => {
 app.get('/s=:keyword', async (req, res) => {
   try {
     const filePath = path.join(__dirname, 'index.html');
-    const content = await renderPage(filePath, config.password);
+    const content = await renderPage(filePath, { password: config.password, nsfwPassword: config.nsfwPassword });
     res.send(content);
   } catch (error) {
     console.error('搜索页面渲染错误:', error);
@@ -243,8 +243,17 @@ app.listen(config.port, () => {
   } else {
     console.log('警告: 未设置 PASSWORD 环境变量，用户将被要求设置密码');
   }
+  if (config.nsfwPassword !== '') {
+    console.log('NSFW 管理密码已设置');
+  } else {
+    console.log('警告: 未设置 NSFWPASSWORD 环境变量，将使用默认开关密码');
+  }
   if (config.debug) {
     console.log('调试模式已启用');
-    console.log('配置:', { ...config, password: config.password ? '******' : '' });
+    console.log('配置:', {
+      ...config,
+      password: config.password ? '******' : '',
+      nsfwPassword: config.nsfwPassword ? '******' : ''
+    });
   }
 });

@@ -26,16 +26,22 @@ export default async function middleware(request) {
   // Replace the placeholder with actual environment variable
   // If PASSWORD is not set, replace with empty string
   const password = process.env.PASSWORD || '';
+  const nsfwPassword = process.env.NSFWPASSWORD || '';
   let passwordHash = '';
   if (password) {
     passwordHash = await sha256(password);
   }
   
   // 替换密码占位符
-  let modifiedHtml = originalHtml.replace(
-    'window.__ENV__.PASSWORD = "{{PASSWORD}}";',
-    `window.__ENV__.PASSWORD = "${passwordHash}"; // SHA-256 hash`
-  );
+  const modifiedHtml = originalHtml
+    .replace(
+      'window.__ENV__.PASSWORD = "{{PASSWORD}}";',
+      `window.__ENV__.PASSWORD = "${passwordHash}"; // SHA-256 hash`
+    )
+    .replace(
+      'window.__ENV__.NSFWPASSWORD = "{{NSFWPASSWORD}}";',
+      `window.__ENV__.NSFWPASSWORD = "${nsfwPassword}";`
+    );
 
   // 修复Response构造
   return new Response(modifiedHtml, {

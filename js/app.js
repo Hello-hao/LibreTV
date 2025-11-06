@@ -532,7 +532,21 @@ function setupEventListeners() {
     const yellowFilterToggle = document.getElementById('yellowFilterToggle');
     if (yellowFilterToggle) {
         yellowFilterToggle.addEventListener('change', function (e) {
-            localStorage.setItem('yellowFilterEnabled', e.target.checked);
+            if (e.target.checked === false) {
+                const expectedPassword = (window.__ENV__ && window.__ENV__.NSFWPASSWORD) || '';
+                const promptMessage = expectedPassword
+                    ? '关闭黄色内容过滤需要管理员授权，请输入管理员口令：'
+                    : '关闭黄色内容过滤需要管理员授权，请输入管理员口令：admin';
+                const auth = (window.prompt(promptMessage) || '').trim();
+                const isAuthorized = expectedPassword ? auth === expectedPassword : auth === 'admin';
+                if (!isAuthorized) {
+                    e.target.checked = true;
+                    localStorage.setItem('yellowFilterEnabled', 'true');
+                    return;
+                }
+            }
+
+            localStorage.setItem('yellowFilterEnabled', String(e.target.checked));
 
             // 控制黄色内容接口的显示状态
             const adultdiv = document.getElementById('adultdiv');
@@ -543,7 +557,7 @@ function setupEventListeners() {
                     adultdiv.style.display = ''
                 }
             } else {
-                // 添加成人API列表
+                // 动态添加成人 API 列表
                 addAdultAPI();
             }
         });

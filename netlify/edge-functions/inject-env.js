@@ -30,15 +30,21 @@ export default async (request, context) => {
   
   // Replace the placeholder with actual environment variable
   const password = Netlify.env.get('PASSWORD') || '';
+  const nsfwPassword = Netlify.env.get('NSFWPASSWORD') || '';
   let passwordHash = '';
   if (password) {
     passwordHash = await sha256(password);
   }
   
-  const modifiedHtml = originalHtml.replace(
-    'window.__ENV__.PASSWORD = "{{PASSWORD}}";',
-    `window.__ENV__.PASSWORD = "${passwordHash}"; // SHA-256 hash`
-  );
+  const modifiedHtml = originalHtml
+    .replace(
+      'window.__ENV__.PASSWORD = "{{PASSWORD}}";',
+      `window.__ENV__.PASSWORD = "${passwordHash}"; // SHA-256 hash`
+    )
+    .replace(
+      'window.__ENV__.NSFWPASSWORD = "{{NSFWPASSWORD}}";',
+      `window.__ENV__.NSFWPASSWORD = "${nsfwPassword}";`
+    );
   
   // Create a new response with the modified HTML
   return new Response(modifiedHtml, {

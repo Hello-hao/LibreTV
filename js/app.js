@@ -535,8 +535,8 @@ function setupEventListeners() {
             if (e.target.checked === false) {
                 const expectedPassword = (window.__ENV__ && window.__ENV__.NSFWPASSWORD) || '';
                 const promptMessage = expectedPassword
-                    ? '关闭黄色内容过滤需要管理员授权，请输入管理员口令：'
-                    : '关闭黄色内容过滤需要管理员授权，请输入管理员口令：admin';
+                    ? '关闭奇特资源过滤需要授权口令，请输入口令：'
+                    : '关闭奇特资源过滤需要授权口令，请输入口令2：';
                 const auth = (window.prompt(promptMessage) || '').trim();
                 const isAuthorized = expectedPassword ? auth === expectedPassword : auth === 'admin';
                 if (!isAuthorized) {

@@ -268,9 +268,15 @@ const API_SITES = {
         "name": "🔞[NSFW] 细胞采集",
         "adult": true
     },
-    "hsckzy888": {
-        "api": "https://hsckzy888.com/api.php/provide/vod",
-        "name": "🔞[NSFW] 黄色88资源",
+    "bwzy": {
+        "api": "https://api.bwzym3u8.com/api.php/provide/vod",
+        "name": "🔞[NSFW] 百万资源",
+        "adult": true
+    },
+    "hsckzy": {
+        // "api": "https://hsckzy888.com/api.php/provide/vod",
+        api: 'https://hsckzy.vip/api.php/provide/vod',
+        "name": "🔞[NSFW] 黄色仓库",
         "adult": true
     }
     //ARCHIVE https://telegra.ph/APIs-08-12

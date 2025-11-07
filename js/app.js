@@ -1,5 +1,5 @@
 // 全局变量
-let selectedAPIs = JSON.parse(localStorage.getItem('selectedAPIs') || '["tyyszy","dyttzy", "bfzy", "ruyi"]'); // 默认选中资源
+let selectedAPIs = JSON.parse(localStorage.getItem('selectedAPIs') || '["dyttzy", "ffzy", "bfzy","wwzy"]'); // 默认选中资源
 let customAPIs = JSON.parse(localStorage.getItem('customAPIs') || '[]'); // 存储自定义API列表
 
 // 添加当前播放的集数索引
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // 设置默认API选择（如果是第一次加载）
     if (!localStorage.getItem('hasInitializedDefaults')) {
         // 默认选中资源
-        selectedAPIs = ["tyyszy", "bfzy", "dyttzy", "ruyi"];
+        // selectedAPIs = ["dyttzy", "ffzy", "lzi", "bfzy","wwzy"];
         localStorage.setItem('selectedAPIs', JSON.stringify(selectedAPIs));
 
         // 默认选中过滤开关
@@ -72,7 +72,7 @@ function initAPICheckboxes() {
     normaldiv.className = 'grid grid-cols-2 gap-2';
     const normalTitle = document.createElement('div');
     normalTitle.className = 'api-group-title';
-    normalTitle.textContent = '普通资源';
+    normalTitle.textContent = '常规影视引擎';
     normaldiv.appendChild(normalTitle);
 
     // 创建普通API源的复选框
@@ -117,10 +117,10 @@ function addAdultAPI() {
         // 添加成人API组标题
         const adultdiv = document.createElement('div');
         adultdiv.id = 'adultdiv';
-        adultdiv.className = 'grid grid-cols-2 gap-2';
+        adultdiv.className = 'grid-cols-1 gap-2';  // 改为 grid grid-cols-1 单列
         const adultTitle = document.createElement('div');
         adultTitle.className = 'api-group-title adult';
-        adultTitle.innerHTML = `黄色资源采集站 <span class="adult-warning">
+        adultTitle.innerHTML = `NSFW 资源引擎 <span class="adult-warning">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -135,7 +135,7 @@ function addAdultAPI() {
             const checked = selectedAPIs.includes(apiKey);
 
             const checkbox = document.createElement('div');
-            checkbox.className = 'flex items-center';
+            checkbox.className = 'flex items-center pb-[3px]';
             checkbox.innerHTML = `
                 <input type="checkbox" id="api_${apiKey}" 
                        class="form-checkbox h-3 w-3 text-blue-600 bg-[#222] border border-[#333] api-adult" 
@@ -154,6 +154,7 @@ function addAdultAPI() {
         container.appendChild(adultdiv);
     }
 }
+
 
 // 检查是否有成人API被选中
 function checkAdultAPIsSelected() {
@@ -180,7 +181,7 @@ function checkAdultAPIsSelected() {
 
         // 修改描述文字
         if (filterDescription) {
-            filterDescription.innerHTML = '<strong class="text-pink-300">选中黄色资源站时无法启用此过滤</strong>';
+            filterDescription.innerHTML = '<strong class="text-pink-300">选中【NSFW】下的资源站时无法启用此功能</strong>';
         }
 
         // 移除提示信息（如果存在）
@@ -195,7 +196,7 @@ function checkAdultAPIsSelected() {
 
         // 恢复原来的描述文字
         if (filterDescription) {
-            filterDescription.innerHTML = '过滤"伦理片"等黄色内容';
+            filterDescription.innerHTML = '[常规模式] 关闭后搜索内容可能会发生变化';
         }
 
         // 移除提示信息
@@ -534,7 +535,7 @@ function setupEventListeners() {
         yellowFilterToggle.addEventListener('change', function (e) {
             if (e.target.checked === false) {
                 const expectedPassword = (window.__ENV__ && window.__ENV__.NSFWPASSWORD) || '';
-                const promptMessage =  '关闭奇特资源过滤需要授权口令，请输入口令：';
+                const promptMessage =  '关闭 [常规模式] 需要授权口令，请输入口令：';
                 const auth = (window.prompt(promptMessage) || '').trim();
                 const isAuthorized = auth === expectedPassword;
                 if (!isAuthorized) {
@@ -596,11 +597,11 @@ function resetSearchArea() {
     try {
         window.history.pushState(
             {},
-            `LibreTV - 免费在线视频搜索与观看平台`,
+            `影多多 - 免费在线视频搜索与观看平台`,
             `/`
         );
         // 更新页面标题
-        document.title = `LibreTV - 免费在线视频搜索与观看平台`;
+        document.title = `影多多 - 免费在线视频搜索与观看平台`;
     } catch (e) {
         console.error('更新浏览器历史失败:', e);
     }
@@ -654,7 +655,7 @@ async function search() {
 
         // 从所有选中的API源搜索
         let allResults = [];
-        const searchPromises = selectedAPIs.map(apiId => 
+        const searchPromises = selectedAPIs.map(apiId =>
             searchByAPIAndKeyWord(apiId, query)
         );
 
@@ -673,7 +674,7 @@ async function search() {
             // 首先按照视频名称排序
             const nameCompare = (a.vod_name || '').localeCompare(b.vod_name || '');
             if (nameCompare !== 0) return nameCompare;
-            
+
             // 如果名称相同，则按照来源排序
             return (a.source_name || '').localeCompare(b.source_name || '');
         });
@@ -964,15 +965,15 @@ async function showDetails(id, vod_name, sourceCode) {
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-2">
                     <div class="flex items-center gap-2">
                         <button onclick="toggleEpisodeOrder('${sourceCode}', '${id}')" 
-                                class="px-3 py-1.5 bg-[#333] hover:bg-[#444] border border-[#444] rounded text-sm transition-colors flex items-center gap-1">
-                            <svg class="w-4 h-4 transform ${episodesReversed ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                            </svg>
-                            <span>${episodesReversed ? '正序排列' : '倒序排列'}</span>
-                        </button>
-                        <span class="text-gray-400 text-sm">共 ${data.episodes.length} 集</span>
+        class="px-1 py-0.5 bg-[#333] hover:bg-[#444] border border-[#444] rounded text-xs transition-colors flex items-center gap-0.5">
+    <svg class="w-3 h-3 transform ${episodesReversed ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+    </svg>
+    <span>${episodesReversed ? '正序' : '倒序'}</span>
+</button>
+                        <span class="text-gray-400 text-sm"> 共 ${data.episodes.length} 集</span>
                     </div>
-                    <button onclick="copyLinks()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors">
+                    <button onclick="copyLinks()" class="px-1.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors">
                         复制链接
                     </button>
                 </div>
